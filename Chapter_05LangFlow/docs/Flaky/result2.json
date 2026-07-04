@@ -1,0 +1,33 @@
+{
+  "stats": {
+    "startTime": "2026-06-21T10:05:00.000Z",
+    "duration": 12300,
+    "expected": 4,
+    "unexpected": 0,
+    "flaky": 0,
+    "skipped": 0
+  },
+  "suites": [
+    {
+      "title": "Authentication & Dashboard",
+      "specs": [
+        {
+          "title": "Test Case 1: User can login with valid credentials",
+          "tests": [{ "status": "expected", "results": [{ "status": "passed" }] }]
+        },
+        {
+          "title": "Test Case 2: User sees error with invalid credentials",
+          "tests": [{ "status": "expected", "results": [{ "status": "passed" }] }]
+        },
+        {
+          "title": "Test Case 3: Dashboard metrics load correctly",
+          "tests": [{ "status": "expected", "results": [{ "status": "passed" }] }]
+        },
+        {
+          "title": "Test Case 4: User can logout successfully",
+          "tests": [{ "status": "expected", "results": [{ "status": "passed" }] }]
+        }
+      ]
+    }
+  ]
+}

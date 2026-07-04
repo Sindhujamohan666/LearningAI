@@ -1,0 +1,140 @@
+import React, { useState } from 'react';
+import SettingsPanel from './components/SettingsPanel';
+import IssueInput from './components/IssueInput';
+import TestPlanDisplay from './components/TestPlanDisplay';
+import { fetchJiraIssue, generateTestPlan, validateJiraConnection, validateGroqConnection } from './services/api';
+import './App.css';
+
+/**
+ * Main App Component
+ * Orchestrates settings, issue input, and test plan generation
+ */
+const App = () => {
+  const [settings, setSettings] = useState(null);
+  const [testPlan, setTestPlan] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [statusMessage, setStatusMessage] = useState('');
+
+  const handleSettingsSave = (newSettings) => {
+    setSettings(newSettings);
+    setStatusMessage('Settings saved successfully');
+    setTimeout(() => setStatusMessage(''), 3000);
+  };
+
+  const handleValidateConnection = async (validatingSettings) => {
+    setIsLoading(true);
+    setError(null);
+    setStatusMessage('Validating connections...');
+
+    try {
+      // Validate JIRA
+      const jiraResult = await validateJiraConnection(validatingSettings.jira);
+      if (!jiraResult.success) {
+        setError(`JIRA validation failed: ${jiraResult.error}`);
+        setIsLoading(false);
+        return;
+      }
+
+      // Validate GROQ
+      const groqResult = await validateGroqConnection(validatingSettings.groq);
+      if (!groqResult.success) {
+        setError(`GROQ validation failed: ${groqResult.error}`);
+        setIsLoading(false);
+        return;
+      }
+
+      setStatusMessage('All connections validated successfully');
+      setTimeout(() => setStatusMessage(''), 3000);
+    } catch (err) {
+      setError(`Validation error: ${err.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGenerate = async (issueId) => {
+    if (!settings) {
+      setError('Please configure settings first');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+    setTestPlan(null);
+
+    try {
+      // Fetch JIRA issue
+      setStatusMessage('Fetching JIRA issue...');
+      const issueResult = await fetchJiraIssue(settings.jira, issueId);
+      if (!issueResult.success) {
+        setError(`Failed to fetch issue: ${issueResult.error}`);
+        setIsLoading(false);
+        return;
+      }
+
+      // Generate test plan
+      setStatusMessage('Generating test plan...');
+      const planResult = await generateTestPlan(settings.groq, issueResult.issue);
+      if (!planResult.success) {
+        setError(`Failed to generate test plan: ${planResult.error}`);
+        setIsLoading(false);
+        return;
+      }
+
+      setTestPlan(planResult);
+      setStatusMessage('Test plan generated successfully');
+      setTimeout(() => setStatusMessage(''), 3000);
+    } catch (err) {
+      setError(`Generation error: ${err.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="app">
+      <header className="app-header">
+        <h1>JIRA Test Plan Generator</h1>
+        <p>AI-powered test planning for JIRA issues</p>
+      </header>
+
+      <main className="app-content">
+        <SettingsPanel 
+          onSettingsSave={handleSettingsSave}
+          onValidate={handleValidateConnection}
+        />
+
+        {statusMessage && (
+          <div className="status-message">
+            {statusMessage}
+          </div>
+        )}
+
+        {error && (
+          <div className="error-message">
+            {error}
+            <button onClick={() => setError(null)}>×</button>
+          </div>
+        )}
+
+        <div className="generator-section">
+          <IssueInput 
+            onGenerate={handleGenerate}
+            isLoading={isLoading}
+          />
+
+          <TestPlanDisplay 
+            testPlan={testPlan}
+            isLoading={isLoading}
+            error={error}
+          />
+        </div>
+      </main>
+
+      <footer className="app-footer"></footer>
+    </div>
+  );
+};
+
+export default App;

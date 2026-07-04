@@ -1,0 +1,95 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "HI I am QA Buddy!",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -16,
+        -64
+      ],
+      "id": "baa61c2d-6575-4d63-bcd7-aecdf9f69f78",
+      "name": "When chat message received",
+      "webhookId": "fe37fb81-77ce-4fbb-b981-58cbf9e13b97"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a QA assistant .You will only answer queries related to QA."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        192,
+        -64
+      ],
+      "id": "5d4aa24c-5116-497a-b76d-be775fcf1682",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "qwen/qwen3-32b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        64,
+        144
+      ],
+      "id": "06da80ed-02cc-49d8-ba92-38f0334565bb",
+      "name": "Qwen Brain",
+      "credentials": {
+        "groqApi": {
+          "id": "LstGZY0dorkBo2UH",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qwen Brain": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "88ef65e5-1816-4977-b5cd-8b81a035cc91",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "eac8ee3ad149d2d2e88eb1f1c5d5706f0add72b4fd42d64446521ffd1b6a02de"
+  },
+  "nodeGroups": [],
+  "id": "XU2ZLclvDlec2M2a",
+  "tags": []
+}
