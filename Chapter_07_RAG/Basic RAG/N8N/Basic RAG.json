@@ -1,0 +1,399 @@
+{
+  "name": "RAG Ingestion",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "Objective:\nBuild a basic RAG which can ingest a text or PDF. It will ingest into a database by using an embedding model, and I will also be able to retrieve it by using a chat option."
+      },
+      "id": "964ee24e-9180-43f6-ad68-32648cba584c",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -784,
+        -320
+      ]
+    },
+    {
+      "parameters": {
+        "content": "Phase 1: Ingestion \n",
+        "height": 384,
+        "width": 1008,
+        "color": 2
+      },
+      "id": "660a64fd-f0f4-48e1-8d13-25df9a8d16db",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -496,
+        -416
+      ]
+    },
+    {
+      "parameters": {
+        "formTitle": "Upload a document",
+        "formDescription": "Upload a PDF or text file to ingest into the knowledge base.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Document",
+              "fieldType": "file",
+              "fieldName": "document",
+              "multipleFiles": false,
+              "acceptFileTypes": ".pdf,.txt,.json,.doc,.html",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-0001-4000-8000-000000000001",
+      "name": "Upload PDF Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -432,
+        -320
+      ],
+      "webhookId": "a1b2c3d4-0001-4000-8000-000000000099"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "f36ebe51-d69e-4840-b396-24fa76e734c0",
+      "name": "Embeddings OpenAI Amall",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -160,
+        -176
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "textSplittingMode": "custom",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "value": "={{ $('Upload PDF Form').item.json.document.filename }}"
+              },
+              {
+                "name": "UploadedAt",
+                "value": "={{ $now.toISO()}}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "f0eaeace-9120-4453-90a4-ecb17fa1ed93",
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        96,
+        -256
+      ],
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "chunkOverlap": 200,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        160,
+        -128
+      ],
+      "id": "82e85aa9-5232-4e8c-978c-77a3be9a9598",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "pcone-1536",
+          "mode": "list",
+          "cachedResultName": "pcone-1536"
+        },
+        "options": {}
+      },
+      "id": "e854bcc1-4c01-43b7-b32e-fefce1eec4a0",
+      "name": "Store Doc to Vector DB",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        -240,
+        -384
+      ],
+      "credentials": {
+        "pineconeApi": {
+          "id": "64xsAhVN1DFxJjpI",
+          "name": "Pinecone account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Phase 2:RAG Fetching ",
+        "height": 416,
+        "width": 1040,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -528,
+        48
+      ],
+      "typeVersion": 1,
+      "id": "8b7e0d9e-66e0-4e02-9449-42af98b54631",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -416,
+        128
+      ],
+      "id": "c84fc42d-f897-498a-8b27-b977974a26cf",
+      "name": "When chat message received",
+      "webhookId": "3d13720d-838d-487d-a113-ec261790f26f"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a helpful assistant that answers questions based only on the retrieved documents. Use the \"Retrieve from Pinecone\" tool to search for relevant information. If you cannot find the answer in the retrieved documents, respond with: \"I couldn't find that in the uploaded documents\". Always cite which document(filename) you found the information in."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -224,
+        64
+      ],
+      "id": "2324312c-b8c2-4578-9a2b-589af4c6dc20",
+      "name": "RAG AI agent"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        -112,
+        288
+      ],
+      "id": "47314293-f56c-4ed6-a9fc-2c18f710dba0",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "pcone-1536",
+          "mode": "list",
+          "cachedResultName": "pcone-1536"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        144,
+        176
+      ],
+      "id": "11c2439c-8409-4716-8039-bd7e56ae5611",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "64xsAhVN1DFxJjpI",
+          "name": "Pinecone account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -256,
+        240
+      ],
+      "id": "96e10b9e-9e4a-4ca4-befc-b62629610aa7",
+      "name": "gpt-5 mini",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        96,
+        320
+      ],
+      "id": "450d0df3-8a82-44e0-a6cc-d98f681864a8",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Upload PDF Form": {
+      "main": [
+        [
+          {
+            "node": "Store Doc to Vector DB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI Amall": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Store Doc to Vector DB",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Store Doc to Vector DB",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "RAG AI agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RAG AI agent": {
+      "main": [
+        []
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "RAG AI agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "RAG AI agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gpt-5 mini": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "RAG AI agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "537137eb-2f6d-42d8-b554-c1549774255a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "13f55eb9927b71b1d0288c038e910a715a42b9acf7ab44383ce12b1345ae5233"
+  },
+  "nodeGroups": [],
+  "id": "lrigUcg4wAIv8FBO",
+  "tags": []
+}
