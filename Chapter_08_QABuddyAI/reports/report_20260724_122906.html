@@ -1,0 +1,369 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>QABuddyAI Report</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f5f7fa;color:#1f2937}
+.header{background:linear-gradient(135deg,#6366f1,#a855f7);color:white;padding:2rem;text-align:center}
+.header h1{font-size:1.8rem} .header p{opacity:0.85;margin-top:0.4rem}
+.container{max-width:1100px;margin:0 auto;padding:2rem}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
+.card{background:white;border-radius:14px;padding:1.2rem;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,0.05)}
+.card .num{font-size:2rem;font-weight:800} .card .lbl{color:#6b7280;font-size:0.8rem;text-transform:uppercase}
+.section{background:white;border-radius:14px;padding:1.5rem;margin-bottom:1.5rem;box-shadow:0 2px 12px rgba(0,0,0,0.05)}
+.section h2{font-size:1.1rem;color:#6366f1;margin-bottom:1rem}
+table{width:100%;border-collapse:collapse}
+th,td{padding:0.6rem 0.8rem;text-align:left;border-bottom:1px solid #e5e7eb;font-size:0.85rem}
+th{background:#f9fafb;font-weight:600;color:#6b7280;text-transform:uppercase;font-size:0.75rem}
+.pass{color:#10b981;font-weight:600}.fail{color:#ef4444;font-weight:600}
+.footer{text-align:center;color:#9ca3af;font-size:0.8rem;padding:1rem}
+</style></head><body>
+<div class="header"><h1>🧪 QABuddyAI Test Report</h1><p>Generated: 2026-07-24 12:29 | Framework: playwright</p></div>
+<div class="container">
+<div class="cards">
+<div class="card"><div class="num" style="color:#6366f1;">34</div><div class="lbl">Total Tests</div></div>
+<div class="card"><div class="num" style="color:#10b981;">22</div><div class="lbl">Passed</div></div>
+<div class="card"><div class="num" style="color:#ef4444;">12</div><div class="lbl">Failed</div></div>
+<div class="card"><div class="num" style="color:#8b5cf6;">64.7%</div><div class="lbl">Pass Rate</div></div>
+</div>
+<div class="section"><h2>Test Results</h2><table><thead><tr><th>TC ID</th><th>Feature</th><th>Scenario</th><th>Status</th><th>Duration</th></tr></thead><tbody><tr>
+            <td>TC-001</td>
+            <td>User Authentication</td>
+            <td>Valid email/password registration</td>
+            <td class="pass">PASS</td>
+            <td>6s</td>
+        </tr><tr>
+            <td>TC-002</td>
+            <td>User Authentication</td>
+            <td>Registration with existing email</td>
+            <td class="pass">PASS</td>
+            <td>11s</td>
+        </tr><tr>
+            <td>TC-003</td>
+            <td>User Authentication</td>
+            <td>Social login with Google</td>
+            <td class="fail">FAIL</td>
+            <td>1s</td>
+        </tr><tr>
+            <td>TC-004</td>
+            <td>User Authentication</td>
+            <td>MFA code validation</td>
+            <td class="fail">FAIL</td>
+            <td>10s</td>
+        </tr><tr>
+            <td>TC-005</td>
+            <td>User Authentication</td>
+            <td>Password reset flow</td>
+            <td class="pass">PASS</td>
+            <td>6s</td>
+        </tr><tr>
+            <td>TC-006</td>
+            <td>User Authentication</td>
+            <td>Account lockout after 5 failed attempts</td>
+            <td class="fail">FAIL</td>
+            <td>1s</td>
+        </tr><tr>
+            <td>TC-007</td>
+            <td>User Authentication</td>
+            <td>Session timeout after 30 min inactivity</td>
+            <td class="pass">PASS</td>
+            <td>9s</td>
+        </tr><tr>
+            <td>TC-008</td>
+            <td>Product Catalog</td>
+            <td>Display product with all details</td>
+            <td class="pass">PASS</td>
+            <td>15s</td>
+        </tr><tr>
+            <td>TC-009</td>
+            <td>Product Catalog</td>
+            <td>Filter by category and price range</td>
+            <td class="fail">FAIL</td>
+            <td>1s</td>
+        </tr><tr>
+            <td>TC-010</td>
+            <td>Product Catalog</td>
+            <td>Search with partial text match</td>
+            <td class="pass">PASS</td>
+            <td>14s</td>
+        </tr><tr>
+            <td>TC-011</td>
+            <td>Product Catalog</td>
+            <td>Sort by price ascending</td>
+            <td class="pass">PASS</td>
+            <td>3s</td>
+        </tr><tr>
+            <td>TC-012</td>
+            <td>Product Catalog</td>
+            <td>Pagination with 25 items</td>
+            <td class="fail">FAIL</td>
+            <td>4s</td>
+        </tr><tr>
+            <td>TC-013</td>
+            <td>Product Catalog</td>
+            <td>Out of stock product visibility</td>
+            <td class="pass">PASS</td>
+            <td>5s</td>
+        </tr><tr>
+            <td>TC-014</td>
+            <td>Product Catalog</td>
+            <td>Product image gallery navigation</td>
+            <td class="fail">FAIL</td>
+            <td>1s</td>
+        </tr><tr>
+            <td>TC-015</td>
+            <td>Shopping Cart</td>
+            <td>Add single item to cart</td>
+            <td class="fail">FAIL</td>
+            <td>7s</td>
+        </tr><tr>
+            <td>TC-016</td>
+            <td>Shopping Cart</td>
+            <td>Add multiple items with quantities</td>
+            <td class="fail">FAIL</td>
+            <td>4s</td>
+        </tr><tr>
+            <td>TC-017</td>
+            <td>Shopping Cart</td>
+            <td>Remove item from cart</td>
+            <td class="pass">PASS</td>
+            <td>6s</td>
+        </tr><tr>
+            <td>TC-018</td>
+            <td>Shopping Cart</td>
+            <td>Apply valid promo code</td>
+            <td class="pass">PASS</td>
+            <td>6s</td>
+        </tr><tr>
+            <td>TC-019</td>
+            <td>Shopping Cart</td>
+            <td>Apply expired promo code</td>
+            <td class="pass">PASS</td>
+            <td>6s</td>
+        </tr><tr>
+            <td>TC-020</td>
+            <td>Shopping Cart</td>
+            <td>Cart persistence across sessions</td>
+            <td class="pass">PASS</td>
+            <td>12s</td>
+        </tr><tr>
+            <td>TC-021</td>
+            <td>Shopping Cart</td>
+            <td>Minimum order amount enforcement</td>
+            <td class="pass">PASS</td>
+            <td>5s</td>
+        </tr><tr>
+            <td>TC-022</td>
+            <td>Shopping Cart</td>
+            <td>Save item for later</td>
+            <td class="fail">FAIL</td>
+            <td>4s</td>
+        </tr><tr>
+            <td>TC-023</td>
+            <td>Checkout & Payment</td>
+            <td>Complete checkout with credit card</td>
+            <td class="pass">PASS</td>
+            <td>2s</td>
+        </tr><tr>
+            <td>TC-024</td>
+            <td>Checkout & Payment</td>
+            <td>Guest checkout flow</td>
+            <td class="fail">FAIL</td>
+            <td>7s</td>
+        </tr><tr>
+            <td>TC-025</td>
+            <td>Checkout & Payment</td>
+            <td>Invalid card details</td>
+            <td class="fail">FAIL</td>
+            <td>7s</td>
+        </tr><tr>
+            <td>TC-026</td>
+            <td>Checkout & Payment</td>
+            <td>Address validation failure</td>
+            <td class="pass">PASS</td>
+            <td>11s</td>
+        </tr><tr>
+            <td>TC-027</td>
+            <td>Checkout & Payment</td>
+            <td>Payment gateway timeout handling</td>
+            <td class="fail">FAIL</td>
+            <td>13s</td>
+        </tr><tr>
+            <td>TC-028</td>
+            <td>Checkout & Payment</td>
+            <td>Order confirmation receipt</td>
+            <td class="pass">PASS</td>
+            <td>6s</td>
+        </tr><tr>
+            <td>TC-029</td>
+            <td>Order Management</td>
+            <td>View order history</td>
+            <td class="pass">PASS</td>
+            <td>14s</td>
+        </tr><tr>
+            <td>TC-030</td>
+            <td>Order Management</td>
+            <td>Cancel order within 30 minutes</td>
+            <td class="pass">PASS</td>
+            <td>12s</td>
+        </tr><tr>
+            <td>TC-031</td>
+            <td>Order Management</td>
+            <td>Cancel order after 30 minutes</td>
+            <td class="pass">PASS</td>
+            <td>9s</td>
+        </tr><tr>
+            <td>TC-032</td>
+            <td>Order Management</td>
+            <td>Request return/refund</td>
+            <td class="pass">PASS</td>
+            <td>5s</td>
+        </tr><tr>
+            <td>TC-033</td>
+            <td>Order Management</td>
+            <td>Download invoice PDF</td>
+            <td class="pass">PASS</td>
+            <td>3s</td>
+        </tr><tr>
+            <td>TC-034</td>
+            <td>Order Management</td>
+            <td>Order status notification</td>
+            <td class="pass">PASS</td>
+            <td>14s</td>
+        </tr></tbody></table></div>
+<div class="section"><h2>Requirements Traceability Matrix</h2><table><thead><tr><th>Requirement</th><th>Source</th><th>TC ID</th><th>Status</th></tr></thead><tbody><tr>
+            <td>User Authentication</td><td>PRD/SRS</td>
+            <td>TC-001</td>
+            <td class="pass">PASS</td>
+        </tr><tr>
+            <td>Product Catalog</td><td>PRD/SRS</td>
+            <td>TC-002</td>
+            <td class="pass">PASS</td>
+        </tr><tr>
+            <td>Shopping Cart</td><td>PRD/SRS</td>
+            <td>TC-003</td>
+            <td class="fail">FAIL</td>
+        </tr><tr>
+            <td>Checkout & Payment</td><td>PRD/SRS</td>
+            <td>TC-004</td>
+            <td class="fail">FAIL</td>
+        </tr><tr>
+            <td>Order Management</td><td>PRD/SRS</td>
+            <td>TC-005</td>
+            <td class="pass">PASS</td>
+        </tr><tr>
+            <td>User Authentication</td><td>PRD/SRS</td>
+            <td>TC-006</td>
+            <td class="fail">FAIL</td>
+        </tr><tr>
+            <td>User Authentication</td><td>PRD/SRS</td>
+            <td>TC-007</td>
+            <td class="pass">PASS</td>
+        </tr><tr>
+            <td>Product Catalog</td><td>PRD/SRS</td>
+            <td>TC-008</td>
+            <td class="pass">PASS</td>
+        </tr><tr>
+            <td>Product Catalog</td><td>PRD/SRS</td>
+            <td>TC-009</td>
+            <td class="fail">FAIL</td>
+        </tr><tr>
+            <td>Product Catalog</td><td>PRD/SRS</td>
+            <td>TC-010</td>
+            <td class="pass">PASS</td>
+        </tr><tr>
+            <td>Product Catalog</td><td>PRD/SRS</td>
+            <td>TC-011</td>
+            <td class="pass">PASS</td>
+        </tr><tr>
+            <td>Product Catalog</td><td>PRD/SRS</td>
+            <td>TC-012</td>
+            <td class="fail">FAIL</td>
+        </tr><tr>
+            <td>Product Catalog</td><td>PRD/SRS</td>
+            <td>TC-013</td>
+            <td class="pass">PASS</td>
+        </tr><tr>
+            <td>Product Catalog</td><td>PRD/SRS</td>
+            <td>TC-014</td>
+            <td class="fail">FAIL</td>
+        </tr><tr>
+            <td>Shopping Cart</td><td>PRD/SRS</td>
+            <td>TC-015</td>
+            <td class="fail">FAIL</td>
+        </tr><tr>
+            <td>Shopping Cart</td><td>PRD/SRS</td>
+            <td>TC-016</td>
+            <td class="fail">FAIL</td>
+        </tr><tr>
+            <td>Shopping Cart</td><td>PRD/SRS</td>
+            <td>TC-017</td>
+            <td class="pass">PASS</td>
+        </tr><tr>
+            <td>Shopping Cart</td><td>PRD/SRS</td>
+            <td>TC-018</td>
+            <td class="pass">PASS</td>
+        </tr><tr>
+            <td>Shopping Cart</td><td>PRD/SRS</td>
+            <td>TC-019</td>
+            <td class="pass">PASS</td>
+        </tr><tr>
+            <td>Shopping Cart</td><td>PRD/SRS</td>
+            <td>TC-020</td>
+            <td class="pass">PASS</td>
+        </tr><tr>
+            <td>Shopping Cart</td><td>PRD/SRS</td>
+            <td>TC-021</td>
+            <td class="pass">PASS</td>
+        </tr><tr>
+            <td>Shopping Cart</td><td>PRD/SRS</td>
+            <td>TC-022</td>
+            <td class="fail">FAIL</td>
+        </tr><tr>
+            <td>Checkout & Payment</td><td>PRD/SRS</td>
+            <td>TC-023</td>
+            <td class="pass">PASS</td>
+        </tr><tr>
+            <td>Checkout & Payment</td><td>PRD/SRS</td>
+            <td>TC-024</td>
+            <td class="fail">FAIL</td>
+        </tr><tr>
+            <td>Checkout & Payment</td><td>PRD/SRS</td>
+            <td>TC-025</td>
+            <td class="fail">FAIL</td>
+        </tr><tr>
+            <td>Checkout & Payment</td><td>PRD/SRS</td>
+            <td>TC-026</td>
+            <td class="pass">PASS</td>
+        </tr><tr>
+            <td>Checkout & Payment</td><td>PRD/SRS</td>
+            <td>TC-027</td>
+            <td class="fail">FAIL</td>
+        </tr><tr>
+            <td>Checkout & Payment</td><td>PRD/SRS</td>
+            <td>TC-028</td>
+            <td class="pass">PASS</td>
+        </tr><tr>
+            <td>Order Management</td><td>PRD/SRS</td>
+            <td>TC-029</td>
+            <td class="pass">PASS</td>
+        </tr><tr>
+            <td>Order Management</td><td>PRD/SRS</td>
+            <td>TC-030</td>
+            <td class="pass">PASS</td>
+        </tr><tr>
+            <td>Order Management</td><td>PRD/SRS</td>
+            <td>TC-031</td>
+            <td class="pass">PASS</td>
+        </tr><tr>
+            <td>Order Management</td><td>PRD/SRS</td>
+            <td>TC-032</td>
+            <td class="pass">PASS</td>
+        </tr><tr>
+            <td>Order Management</td><td>PRD/SRS</td>
+            <td>TC-033</td>
+            <td class="pass">PASS</td>
+        </tr><tr>
+            <td>Order Management</td><td>PRD/SRS</td>
+            <td>TC-034</td>
+            <td class="pass">PASS</td>
+        </tr></tbody></table></div>
+</div><div class="footer">QABuddyAI v2.0 • BGE-m3 + Qdrant</div></body></html>

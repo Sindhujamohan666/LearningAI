@@ -1,0 +1,13 @@
+pipeline {
+    agent any
+    stages {
+        stage('Checkout') { steps { checkout scm } }
+        stage('Install Dependencies') { steps { sh 'pip install -r requirements.txt' } }
+        stage('Install Browsers') { steps { sh 'playwright install' } }
+        stage('Run Tests') { steps { sh 'python -m pytest tests/' } }
+    }
+    post {
+        always { archiveArtifacts artifacts: 'reports/**', allowEmptyArchive: true }
+        failure { emailext body: 'Tests failed', subject: 'Build Failed: ${env.JOB_NAME}', to: 'qa-team@company.com' }
+    }
+}
