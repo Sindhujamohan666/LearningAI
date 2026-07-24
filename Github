@@ -1,0 +1,16 @@
+Step 1:
+# To stage all changes, new files, and deletions:
+git add .
+
+# OR, to stage a specific file:
+git add filename.java
+
+Step 2:
+git commit -m "Your descriptive commit message here"
+
+Step 3:
+# If it's your very first push for this branch:
+git push -u origin main
+
+# For all future pushes on this branch, you can just run:
+git push
