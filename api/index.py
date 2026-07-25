@@ -1,9 +1,13 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder=".")
 
 @app.route("/")
 def index():
+    return render_template("architecture.html")
+
+@app.route("/api")
+def api_index():
     return jsonify({
         "name": "QABuddyAI",
         "version": "2.0",
