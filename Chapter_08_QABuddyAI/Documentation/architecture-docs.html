@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QABuddyAI — Backend &amp; Architecture Documentation</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+    :root {
+      --cream: #FAF6EF;
+      --card-bg: #FFFDF9;
+      --card-stroke: #E6DDD0;
+      --text-primary: #1A1A1A;
+      --text-secondary: #8B7355;
+      --text-muted: #B8A898;
+      --terracotta: #D9754C;
+      --terracotta-light: #FDF0E9;
+      --olive: #6B7C32;
+      --olive-light: #F4F7EC;
+      --slate: #556270;
+      --slate-light: #F3F4F6;
+      --mauve: #8B6B7D;
+      --amber: #B6892E;
+      --divider: #E8E0D4;
+      --pre-bg: #F8F3EB;
+      --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--cream);
+      color: var(--text-primary);
+      font-family: 'JetBrains Mono', monospace;
+      min-height: 100vh;
+      line-height: 1.7;
+    }
+
+    /* ── Navigation ── */
+    nav {
+      position: sticky;
+      top: 0;
+      background: rgba(250, 246, 239, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--divider);
+      padding: 1rem 2rem;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      font-size: 0.78rem;
+      font-weight: 500;
+      overflow-x: auto;
+    }
+    nav a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: color 0.15s;
+    }
+    nav a:hover, nav a.active { color: var(--terracotta); }
+    nav .brand {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--terracotta);
+      margin-right: auto;
+    }
+
+    /* ── Layout ── */
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+    }
+
+    /* ── Typography ── */
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary);
+    }
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin: 3rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--divider);
+      color: var(--text-primary);
+    }
+    h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 2rem 0 0.75rem;
+      color: var(--terracotta);
+    }
+    h4 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin: 1.25rem 0 0.5rem;
+      color: var(--slate);
+    }
+    .subtitle {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+    }
+    p { margin-bottom: 0.75rem; font-size: 0.85rem; }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-stroke);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+      box-shadow: var(--shadow);
+    }
+    .card.terracotta { border-left: 4px solid var(--terracotta); }
+    .card.olive { border-left: 4px solid var(--olive); }
+    .card.slate { border-left: 4px solid var(--slate); }
+    .card.amber { border-left: 4px solid var(--amber); }
+    .card.mauve { border-left: 4px solid var(--mauve); }
+
+    .card h4 { margin-top: 0; }
+
+    /* ── Agent pipeline cards ── */
+    .agent-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-stroke);
+      border-radius: 10px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      display: flex;
+      gap: 1.25rem;
+      align-items: flex-start;
+      box-shadow: var(--shadow);
+    }
+    .agent-number {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      color: white;
+    }
+    .agent-info { flex: 1; }
+    .agent-info h3 { margin: 0 0 0.3rem; font-size: 0.95rem; }
+    .agent-info p { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.3rem; }
+
+    /* ── Badges ── */
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      margin-right: 0.3rem;
+    }
+    .badge.terracotta { background: var(--terracotta-light); color: var(--terracotta); }
+    .badge.olive { background: var(--olive-light); color: var(--olive); }
+    .badge.slate { background: var(--slate-light); color: var(--slate); }
+
+    /* ── Code blocks ── */
+    pre {
+      background: var(--pre-bg);
+      border: 1px solid var(--divider);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      overflow-x: auto;
+      font-size: 0.75rem;
+      line-height: 1.65;
+      margin-bottom: 1rem;
+    }
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--pre-bg);
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+      font-size: 0.8rem;
+      color: var(--terracotta);
+    }
+    pre code {
+      background: none;
+      padding: 0;
+      color: var(--text-primary);
+    }
+
+    /* ── Tables ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.25rem;
+      font-size: 0.8rem;
+    }
+    th, td {
+      padding: 0.65rem 0.85rem;
+      text-align: left;
+      border-bottom: 1px solid var(--divider);
+    }
+    th {
+      background: var(--pre-bg);
+      font-weight: 600;
+      color: var(--slate);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    tr:hover td { background: rgba(248, 243, 235, 0.5); }
+
+    /* ── Tech tag pills ── */
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin: 0.75rem 0;
+    }
+    .tag {
+      padding: 0.2rem 0.7rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      border: 1px solid var(--divider);
+      background: var(--card-bg);
+      color: var(--slate);
+    }
+
+    /* ── Phase indicator ── */
+    .phase-flow {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin: 1.5rem 0;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+    }
+    .phase-step {
+      background: var(--card-bg);
+      border: 1px solid var(--card-stroke);
+      border-radius: 10px;
+      padding: 0.65rem 1rem;
+      font-size: 0.72rem;
+      font-weight: 500;
+      white-space: nowrap;
+      flex-shrink: 0;
+      text-align: center;
+    }
+    .phase-step .num {
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+    .phase-arrow {
+      color: var(--terracotta);
+      font-weight: 700;
+      margin: 0 0.35rem;
+      flex-shrink: 0;
+    }
+
+    /* ── ASCII Diagram ── */
+    .ascii-diagram {
+      background: var(--pre-bg);
+      border: 1px solid var(--divider);
+      border-radius: 8px;
+      padding: 1rem;
+      font-size: 0.7rem;
+      line-height: 1.5;
+      overflow-x: auto;
+      margin-bottom: 1.25rem;
+      white-space: pre;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      border-top: 1px solid var(--divider);
+      margin-top: 3rem;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="brand">🧪 QABuddyAI</span>
+  <a href="#overview">Overview</a>
+  <a href="#architecture">Architecture</a>
+  <a href="#core-engine">Core Engine</a>
+  <a href="#agent-pipeline">Agent Pipeline</a>
+  <a href="#orchestrator">Orchestrator</a>
+  <a href="#data-flow">Data Flow</a>
+  <a href="#configuration">Configuration</a>
+  <a href="#api-reference">API Reference</a>
+</nav>
+
+<main>
+
+<!-- ===== OVERVIEW ===== -->
+<section id="overview">
+<h1>QABuddyAI — Backend &amp; Architecture</h1>
+<p class="subtitle">
+  <span class="badge terracotta">Python 3.11+</span>
+  <span class="badge olive">LangGraph</span>
+  <span class="badge slate">BGE-m3</span>
+  <span class="badge terracotta">Qdrant</span>
+  <span class="badge olive">DeepSeek</span>
+  &nbsp; Multi-Agent RAG Pipeline for QA Automation
+</p>
+
+<div class="card">
+  <p>
+    <strong>QABuddyAI</strong> is an AI-powered Quality Assurance automation platform that ingests
+    project documentation (PRD, SRS, meeting notes, Figma specs, JIRA tickets, Jenkins logs),
+    extracts requirements, auto-generates test cases, executes them via Playwright/Selenium,
+    and produces traceability reports with a Requirements Traceability Matrix (RTM).
+  </p>
+  <p>
+    6 specialized AI agents work in a <strong>sequential pipeline</strong>, orchestrated by a central
+    LangGraph-based controller. The system uses <strong>BGE-m3 embeddings</strong> with FP16
+    acceleration and <strong>Qdrant</strong> as the vector store for Retrieval-Augmented Generation.
+  </p>
+  <div class="tag-row">
+    <span class="tag">RAG Pipeline</span>
+    <span class="tag">Multi-Agent System</span>
+    <span class="tag">Vector Search</span>
+    <span class="tag">Test Automation</span>
+    <span class="tag">CI/CD Integration</span>
+    <span class="tag">HTML Reporting</span>
+    <span class="tag">JIRA Sync</span>
+  </div>
+</div>
+
+<div class="card slate">
+  <h4>📦 Tech Stack at a Glance</h4>
+  <table>
+    <tr><th>Layer</th><th>Technology</th></tr>
+    <tr><td>Embeddings</td><td>BAAI/bge-m3 (FP16)</td></tr>
+    <tr><td>Reranker</td><td>BAAI/bge-reranker-v2-m3</td></tr>
+    <tr><td>Vector Store</td><td>Qdrant (REST API, localhost:6333)</td></tr>
+    <tr><td>LLM Backend</td><td>Ollama / OpenAI / DeepSeek (deepseek-chat)</td></tr>
+    <tr><td>Agent Framework</td><td>LangGraph + LangChain</td></tr>
+    <tr><td>Test Execution</td><td>Playwright (primary), Selenium</td></tr>
+    <tr><td>UI</td><td>Streamlit (light mode)</td></tr>
+    <tr><td>CLI</td><td>Click</td></tr>
+    <tr><td>Reporting</td><td>Jinja2 HTML + Plotly charts</td></tr>
+    <tr><td>Configuration</td><td>Pydantic Settings + .env</td></tr>
+  </table>
+</div>
+</section>
+
+<!-- ===== ARCHITECTURE ===== -->
+<section id="architecture">
+<h2>🏛️ System Architecture</h2>
+
+<p>QABuddyAI follows a <strong>layered architecture</strong> with 4 distinct tiers:</p>
+
+<div class="ascii-diagram">
+┌──────────────────────────────────────────────────────────────────────────┐
+│                        🖥️  PRESENTATION LAYER                           │
+│   ┌─────────────────────┐    ┌──────────────────────────────────────┐   │
+│   │  CLI (Click)        │    │  Streamlit Web App (ui.py)           │   │
+│   │  run · ingest · ask │    │  5 Tabs · Light Mode · Plotly        │   │
+│   └─────────┬───────────┘    └──────────────────┬───────────────────┘   │
+├─────────────┼──────────────────────────────────┼───────────────────────┤
+│             │            🤖  AGENT LAYER         │                       │
+│             └──────────────┬────────────────────┘                       │
+│                            ▼                                             │
+│   ┌────────────────────────────────────────────────────────────────┐    │
+│   │              Orchestrator (orchestrator.py)                     │    │
+│   │               LangGraph State Machine                           │    │
+│   │           State: {docs, reqs, tcs, results, report, errors}     │    │
+│   └──────┬───────┬───────┬───────┬───────┬───────┬───────┬─────────┘    │
+│          ▼       ▼       ▼       ▼       ▼       ▼       ▼              │
+│   ┌──────┐  ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐     │
+│   │ Doc  │  │ Test │ │ Test │ │CI/CD │ │Report│ │ JIRA │ │      │     │
+│   │Analy-│→│ Gen  │→│Exec  │→│Agent │→│Agent │→│Agent │→│ ORCH │     │
+│   │ zer  │  │      │ │      │ │      │ │      │ │      │ │ LOOP │     │
+│   └──┬───┘  └──┬───┘ └──┬───┘ └──┬───┘ └──┬───┘ └──┬───┘ └──────┘     │
+│      │         │        │        │        │        │                    │
+├──────┼─────────┼────────┼────────┼────────┼────────┼────────────────────┤
+│      │         │   ⚙️  CORE ENGINE LAYER   │        │                    │
+│      ▼         ▼        ▼        │        ▼        ▼                    │
+│   ┌──────┐ ┌──────┐ ┌──────┐   │   ┌──────┐ ┌──────┐                  │
+│   │llm.py│ │embed │ │vector│   │   │repor │ │jira  │                  │
+│   │LLM   │ │dings │ │store │   │   │ter.py│ │agent │                  │
+│   │Client│ │.py   │ │.py   │   │   │Jinja2│ │.py   │                  │
+│   └──┬───┘ └──┬───┘ └──┬───┘   │   └──────┘ └──────┘                  │
+│      │        │        │        │                                       │
+├──────┼────────┼────────┼────────┼───────────────────────────────────────┤
+│      │        │        │   💾  DATA LAYER                               │
+│      ▼        ▼        ▼        ▼                                       │
+│   ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐                                  │
+│   │Ollama│ │Qdrant│ │10    │ │repor │                                  │
+│   │OpenAI│ │Vector│ │Source│ │ts/   │                                  │
+│   │DeepS │ │DB    │ │Dirs  │ │      │                                  │
+│   └──────┘ └──────┘ └──────┘ └──────┘                                  │
+└──────────────────────────────────────────────────────────────────────────┘
+</div>
+
+<div class="card terracotta">
+  <h4>🔑 Key Design Decisions</h4>
+  <ul style="font-size:0.83rem; padding-left: 1.2rem; line-height: 1.8;">
+    <li><strong>Modular core engine</strong> — LLM client, embeddings, vector store, and document loading are decoupled for swappable implementations</li>
+    <li><strong>Agent-per-concern</strong> — Each agent has a single responsibility, making the pipeline testable and extensible</li>
+    <li><strong>Stateful orchestrator</strong> — LangGraph state machine tracks full pipeline state with JSON audit trail</li>
+    <li><strong>Dual interface</strong> — CLI for automation/CI, Streamlit UI for interactive exploration</li>
+    <li><strong>LLM abstraction</strong> — Single <code>get_llm()</code> factory supports Ollama, OpenAI, Anthropic, and DeepSeek via unified interface</li>
+    <li><strong>FP16 acceleration</strong> — BGE-m3 embeddings use half-precision for ~2x speed without quality loss</li>
+    <li><strong>Two-stage retrieval</strong> — Vector search (top-k×2) → cross-encoder re-rank (top-k) for precision</li>
+  </ul>
+</div>
+</section>
+
+<!-- ===== CORE ENGINE ===== -->
+<section id="core-engine">
+<h2>⚙️ Core Engine</h2>
+<p>The core engine lives in <code>src/core/</code> and provides the foundational building blocks used by all agents.</p>
+
+<div class="card slate">
+  <h4>config.py — Pydantic Settings</h4>
+  <p>Centralized configuration via <strong>Pydantic BaseSettings</strong>. Reads from <code>.env</code> file with LRU caching via <code>@lru_cache()</code> for zero-cost repeated access.</p>
+  <pre><code>class Settings(BaseSettings):
+    llm_provider: str = "ollama"
+    llm_model: str = "llama3.1"
+    embed_model: str = "BAAI/bge-m3"
+    rerank_model: str = "BAAI/bge-reranker-v2-m3"
+    qdrant_url: str = "http://localhost:6333"
+    qdrant_collection: str = "qabuddy_docs"
+    # ... 20+ env vars
+
+    model_config = {"env_file": ".env", "extra": "ignore"}
+
+@lru_cache()
+def get_settings() -> Settings:
+    return Settings()</code></pre>
+  <div class="tag-row">
+    <span class="tag">Pydantic v2</span>
+    <span class="tag">.env file</span>
+    <span class="tag">LRU cached</span>
+    <span class="tag">Type-safe</span>
+  </div>
+</div>
+
+<div class="card slate">
+  <h4>llm.py — LLM Client Abstraction</h4>
+  <p>Factory function that returns a <strong>LangChain-compatible BaseChatModel</strong>. Supports 4 providers with a single unified interface:</p>
+  <table>
+    <tr><th>Provider</th><th>Implementation</th><th>API Key / Config</th></tr>
+    <tr><td>Ollama</td><td><code>ChatOllama</code></td><td><code>llm_base_url</code> (default: localhost:11434)</td></tr>
+    <tr><td>OpenAI</td><td><code>ChatOpenAI</code></td><td><code>openai_api_key</code></td></tr>
+    <tr><td>Anthropic</td><td><code>ChatAnthropic</code></td><td><code>anthropic_api_key</code></td></tr>
+    <tr><td>DeepSeek</td><td><code>ChatOpenAI</code> (compatible API)</td><td><code>deepseek_api_key</code> + custom base_url</td></tr>
+  </table>
+  <pre><code>def get_llm() -> BaseChatModel:
+    settings = get_settings()
+    if settings.llm_provider == "deepseek":
+        return ChatOpenAI(
+            model=settings.llm_model,
+            api_key=settings.deepseek_api_key,
+            base_url="https://api.deepseek.com",
+            temperature=0.1,
+        )
+    # ... other providers</code></pre>
+</div>
+
+<div class="card slate">
+  <h4>embeddings.py — BGE-m3 + Re-ranker</h4>
+  <p>Wraps <strong>FlagEmbedding</strong> library for state-of-the-art dense embeddings and cross-encoder re-ranking.</p>
+  <pre><code>def embed_documents(texts: list[str]) -> list[list[float]]:
+    model = get_embedding_model()  # BGEM3FlagModel, FP16, lazy-init
+    output = model.encode(texts, return_dense=True, return_sparse=False)
+    return output["dense_vecs"].tolist()  # 1024-dim vectors
+
+def rerank(query: str, documents: list[str], top_k: int = 5) -> list[dict]:
+    reranker = get_reranker()  # FlagReranker, FP16, lazy-init
+    pairs = [[query, doc] for doc in documents]
+    scores = reranker.compute_score(pairs)
+    return sorted(ranked_pairs, key=lambda x: x["score"], reverse=True)[:top_k]</code></pre>
+  <p><strong>Lazy initialization</strong> — models are loaded once on first call, then reused via global singleton. FP16 acceleration is controlled by the <code>BGE_USE_FP16</code> env var.</p>
+</div>
+
+<div class="card slate">
+  <h4>vector_store.py — Qdrant Wrapper</h4>
+  <p>Encapsulates all Qdrant operations: collection creation, document upsert, semantic search, and source-based deletion.</p>
+  <pre><code>class QdrantStore:
+    def __init__(self):
+        self.client = QdrantClient(url=settings.qdrant_url)
+        self.collection = settings.qdrant_collection  # "qabuddy_docs"
+        self._ensure_collection()  # Auto-creates if missing
+
+    def add_documents(self, docs: list[dict]) -> int:
+        vectors = embed_documents(texts)  # BGE-m3
+        points = [PointStruct(id=uuid4(), vector=vec, payload={...}) for ...]
+        self.client.upsert(collection_name=self.collection, points=points)
+
+    def search(self, query: str, top_k: int = 10) -> list[dict]:
+        query_vec = embed_query(query)
+        results = self.client.search(limit=top_k * 2)  # Over-fetch
+        return rerank(query, documents, top_k=top_k)   # Re-rank</code></pre>
+  <p><strong>Two-stage retrieval</strong>: fetch 2× results from Qdrant, then apply cross-encoder re-ranking for precision.</p>
+</div>
+
+<div class="card slate">
+  <h4>document_loader.py — Document Ingestion</h4>
+  <p>Handles reading, parsing, and chunking of project documents from 10 source directories.</p>
+  <table>
+    <tr><th>Format</th><th>Parser</th><th>Supported Extensions</th></tr>
+    <tr><td>Plain text / Markdown</td><td><code>Path.read_text()</code></td><td>.txt, .md, .log, .yaml, .yml, .feature</td></tr>
+    <tr><td>PDF</td><td><code>PyPDF2.PdfReader</code></td><td>.pdf</td></tr>
+    <tr><td>Word Documents</td><td><code>python-docx.Document</code></td><td>.docx</td></tr>
+    <tr><td>CSV</td><td><code>csv.DictReader</code> (UTF-8-BOM)</td><td>.csv</td></tr>
+    <tr><td>JSON</td><td><code>json.loads()</code></td><td>.json</td></tr>
+    <tr><td>Source Code</td><td><code>Path.read_text()</code></td><td>.py, .js, .ts</td></tr>
+  </table>
+  <pre><code>def chunk_text(text: str, chunk_size: int = 1000, overlap: int = 200) -> list[str]:
+    """Sliding-window chunking with overlap for context preservation."""</code></pre>
+</div>
+</section>
+
+<!-- ===== AGENT PIPELINE ===== -->
+<section id="agent-pipeline">
+<h2>🤖 Agent Pipeline</h2>
+<p>6 specialized AI agents run in a <strong>sequential, deterministic pipeline</strong>, each consuming the output of the previous agent.</p>
+
+<div class="phase-flow">
+  <div class="phase-step"><span class="num" style="color:var(--terracotta);">①</span><br/>Document<br/>Analyzer</div>
+  <span class="phase-arrow">→</span>
+  <div class="phase-step"><span class="num" style="color:var(--mauve);">②</span><br/>Test<br/>Generator</div>
+  <span class="phase-arrow">→</span>
+  <div class="phase-step"><span class="num" style="color:var(--amber);">③</span><br/>Test<br/>Executor</div>
+  <span class="phase-arrow">→</span>
+  <div class="phase-step"><span class="num" style="color:var(--olive);">④</span><br/>CI/CD<br/>Agent</div>
+  <span class="phase-arrow">→</span>
+  <div class="phase-step"><span class="num" style="color:var(--slate);">⑤</span><br/>Reporter</div>
+  <span class="phase-arrow">→</span>
+  <div class="phase-step"><span class="num" style="color:var(--terracotta);">⑥</span><br/>JIRA<br/>Agent</div>
+  <span class="phase-arrow">↻</span>
+  <div class="phase-step" style="border: 1px dashed var(--terracotta); background: var(--terracotta-light);">Orchestrator<br/>State Loop</div>
+</div>
+
+<div class="agent-card">
+  <div class="agent-number" style="background: var(--terracotta);">①</div>
+  <div class="agent-info">
+    <h3>Document Analyzer <code>document_analyzer.py</code></h3>
+    <p>RAG-powered requirement extraction agent. Ingests documents, chunks them, embeds with BGE-m3, stores in Qdrant, then performs LLM-based analysis to extract structured requirements.</p>
+    <table>
+      <tr><th>Method</th><th>Description</th></tr>
+      <tr><td><code>ingest(data_dir)</code></td><td>Load all documents from <code>data_dir</code>, chunk text, embed with BGE-m3, upsert into Qdrant. Returns chunk count.</td></tr>
+      <tr><td><code>extract_requirements()</code></td><td>Vector-search Qdrant for relevant context, prompt LLM to extract features, user stories, acceptance criteria, functional/non-functional requirements, and edge cases. Returns structured JSON.</td></tr>
+      <tr><td><code>analyze_document(query)</code></td><td>Interactive RAG Q&A — search Qdrant, build context, prompt LLM for detailed response.</td></tr>
+    </table>
+    <div class="tag-row">
+      <span class="badge terracotta">RAG Pipeline</span>
+      <span class="badge olive">BGE-m3</span>
+      <span class="badge slate">Qdrant Search</span>
+    </div>
+  </div>
+</div>
+
+<div class="agent-card">
+  <div class="agent-number" style="background: var(--mauve);">②</div>
+  <div class="agent-info">
+    <h3>Test Generator <code>test_generator.py</code></h3>
+    <p>Converts extracted requirements into comprehensive, structured test cases using 6 AI-driven design techniques. Saves output as JSON to <code>data/03_test_cases/</code>.</p>
+    <table>
+      <tr><th>Technique</th><th>Description</th></tr>
+      <tr><td>Equivalence Partitioning</td><td>Group inputs into valid/invalid classes</td></tr>
+      <tr><td>Boundary Value Analysis</td><td>Test at edges of input ranges</td></tr>
+      <tr><td>Error Guessing</td><td>Leverage experience to anticipate failures</td></tr>
+      <tr><td>Positive Paths</td><td>Happy-path scenarios</td></tr>
+      <tr><td>Negative Paths</td><td>Invalid input & error handling</td></tr>
+      <tr><td>State Transition</td><td>Model system state changes</td></tr>
+    </table>
+    <p>Each test case includes: <code>tc_id</code>, <code>feature</code>, <code>scenario</code>, <code>preconditions</code>, <code>steps</code> (action+expected), <code>severity</code>, <code>priority</code>, <code>test_type</code>, <code>technique</code>, and <code>tags</code>.</p>
+  </div>
+</div>
+
+<div class="agent-card">
+  <div class="agent-number" style="background: var(--amber);">③</div>
+  <div class="agent-info">
+    <h3>Test Executor <code>test_executor.py</code></h3>
+    <p>Generates runnable test automation code and performs LLM-based dry-run execution.</p>
+    <table>
+      <tr><th>Method</th><th>Description</th></tr>
+      <tr><td><code>execute_dry_run(tcs)</code></td><td>For each test case, prompt LLM to predict pass/fail status, failure reason, and estimated duration. Returns structured results.</td></tr>
+      <tr><td><code>generate_playwright_code(tcs)</code></td><td>Generate complete pytest-playwright Python file with async/await pattern, fixtures, page objects, and screenshot-on-failure.</td></tr>
+      <tr><td><code>generate_selenium_code(tcs)</code></td><td>Generate complete Selenium Python test file with explicit waits, setup/teardown, and assertions.</td></tr>
+    </table>
+    <div class="tag-row">
+      <span class="badge amber">Playwright</span>
+      <span class="badge olive">Selenium</span>
+      <span class="badge slate">LLM Prediction</span>
+    </div>
+  </div>
+</div>
+
+<div class="agent-card">
+  <div class="agent-number" style="background: var(--olive);">④</div>
+  <div class="agent-info">
+    <h3>CI/CD Agent <code>cicd_agent.py</code></h3>
+    <p>Generates CI/CD pipeline templates and analyzes existing pipeline logs.</p>
+    <table>
+      <tr><th>Method</th><th>Description</th></tr>
+      <tr><td><code>generate_github_actions(framework)</code></td><td>Creates <code>github_actions.yml</code> with PR, push, and scheduled triggers, Python setup, Playwright install, and artifact upload.</td></tr>
+      <tr><td><code>generate_jenkinsfile(framework)</code></td><td>Creates <code>Jenkinsfile</code> with Checkout → Install → Test → Report stages and email notifications on failure.</td></tr>
+      <tr><td><code>analyze_jenkins_logs(log_dir)</code></td><td>Scans Jenkins logs for failures, flaky tests, and performance bottlenecks.</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="agent-card">
+  <div class="agent-number" style="background: var(--slate);">⑤</div>
+  <div class="agent-info">
+    <h3>Reporter <code>reporter.py</code></h3>
+    <p>Generates comprehensive HTML test reports with Requirements Traceability Matrix.</p>
+    <table>
+      <tr><th>Method</th><th>Description</th></tr>
+      <tr><td><code>generate_report(results, reqs, framework)</code></td><td>Renders Jinja2 HTML template with summary cards, pass/fail tables, failure details, and RTM. Saves to <code>reports/</code>.</td></tr>
+      <tr><td><code>generate_summary_json(results)</code></td><td>Exports numeric summary (total, passed, failed, pass rate) to JSON for CI/CD integration.</td></tr>
+    </table>
+    <p>The HTML report includes: gradient header, responsive grid layout, color-coded status badges, RTM table linking requirements → test cases → status.</p>
+  </div>
+</div>
+
+<div class="agent-card">
+  <div class="agent-number" style="background: var(--terracotta);">⑥</div>
+  <div class="agent-info">
+    <h3>JIRA Agent <code>jira_agent.py</code></h3>
+    <p>Integrates with JIRA REST API for ticket creation and bug tracking.</p>
+    <table>
+      <tr><th>Method</th><th>Description</th></tr>
+      <tr><td><code>create_test_tickets(tcs)</code></td><td>Creates JIRA test execution tickets linked to generated test cases. Saves tracking JSON to <code>reports/</code>.</td></tr>
+      <tr><td><code>create_bug_tickets(failed_results)</code></td><td>Auto-creates bug tickets for failed tests with reproduction steps, severity, and traceability.</td></tr>
+    </table>
+    <div class="tag-row">
+      <span class="badge terracotta">JIRA REST API</span>
+      <span class="badge slate">Auto Bug Creation</span>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ===== ORCHESTRATOR ===== -->
+<section id="orchestrator">
+<h2>🔄 Orchestrator</h2>
+
+<div class="card terracotta">
+  <h4>orchestrator.py — LangGraph State Machine</h4>
+  <p>The orchestrator chains all 6 agents into a deterministic 7-phase pipeline. It maintains a <strong>state dictionary</strong> that propagates through each phase:</p>
+  <pre><code>class Orchestrator:
+    def __init__(self, data_dir, framework, output_dir, push_jira):
+        self.doc_analyzer = DocumentAnalyzerAgent()
+        self.test_generator = TestGeneratorAgent()
+        self.test_executor = TestExecutorAgent()
+        self.cicd_agent = CICDAgent()
+        self.reporter = ReporterAgent()
+        self.jira_agent = JiraAgent()
+        self.state = {
+            "documents_ingested": 0,
+            "requirements": {},
+            "test_cases": [],
+            "test_results": [],
+            "report_path": "",
+            "jira_tickets": [],
+            "errors": [],
+        }</code></pre>
+
+  <h4 style="margin-top: 1.5rem;">7-Phase Pipeline Execution</h4>
+  <table>
+    <tr><th>#</th><th>Phase</th><th>Agent</th><th>Key Operation</th><th>State Updated</th></tr>
+    <tr><td>1</td><td>Document Ingestion</td><td>Document Analyzer</td><td><code>ingest(data_dir)</code></td><td>documents_ingested</td></tr>
+    <tr><td>2</td><td>Requirements Analysis</td><td>Document Analyzer</td><td><code>extract_requirements()</code></td><td>requirements</td></tr>
+    <tr><td>3</td><td>Test Case Generation</td><td>Test Generator</td><td><code>generate(requirements)</code></td><td>test_cases</td></tr>
+    <tr><td>4</td><td>Test Execution</td><td>Test Executor</td><td><code>execute_dry_run()</code> + code gen</td><td>test_results</td></tr>
+    <tr><td>5</td><td>CI/CD Pipeline</td><td>CI/CD Agent</td><td><code>generate_github_actions()</code> + Jenkinsfile</td><td>—</td></tr>
+    <tr><td>6</td><td>Report & RTM</td><td>Reporter</td><td><code>generate_report()</code></td><td>report_path</td></tr>
+    <tr><td>7</td><td>JIRA Sync</td><td>JIRA Agent</td><td><code>create_test_tickets()</code></td><td>jira_tickets</td></tr>
+  </table>
+
+  <p style="margin-top: 1rem;"><strong>Error handling</strong>: Each phase is wrapped in try/except. Failures are collected in <code>state.errors[]</code> and the pipeline continues to subsequent phases. The full state is saved as <code>pipeline_state_*.json</code> for audit.</p>
+  <p><strong>Progress display</strong>: Uses <code>rich</code> library with spinners, progress bars, and color-coded terminal output.</p>
+</div>
+</section>
+
+<!-- ===== DATA FLOW ===== -->
+<section id="data-flow">
+<h2>📊 Data Flow</h2>
+
+<div class="card olive">
+  <h4>End-to-End Data Journey</h4>
+  <div class="phase-flow" style="margin: 1.25rem 0;">
+    <div class="phase-step">📥 Load<br/>Documents</div>
+    <span class="phase-arrow">→</span>
+    <div class="phase-step">✂️ Chunk<br/>Text</div>
+    <span class="phase-arrow">→</span>
+    <div class="phase-step">🔮 BGE-m3<br/>Embed</div>
+    <span class="phase-arrow">→</span>
+    <div class="phase-step">🗄️ Qdrant<br/>Upsert</div>
+    <span class="phase-arrow">→</span>
+    <div class="phase-step">🔍 Vector<br/>Search</div>
+    <span class="phase-arrow">→</span>
+    <div class="phase-step">🔄 Re-rank<br/>bge-reranker</div>
+    <span class="phase-arrow">→</span>
+    <div class="phase-step">🧠 LLM<br/>Generate</div>
+    <span class="phase-arrow">→</span>
+    <div class="phase-step" style="background: var(--terracotta-light); border-color: var(--terracotta);">📤 Output<br/>Artifacts</div>
+  </div>
+
+  <h4 style="margin-top: 1.5rem;">Output Artifacts</h4>
+  <table>
+    <tr><th>File</th><th>Producer</th><th>Format</th><th>Purpose</th></tr>
+    <tr><td><code>report_*.html</code></td><td>Reporter</td><td>Jinja2 HTML</td><td>Visual test report with RTM</td></tr>
+    <tr><td><code>summary_*.json</code></td><td>Reporter</td><td>JSON</td><td>Numeric summary for CI/CD</td></tr>
+    <tr><td><code>test_results_*.json</code></td><td>Test Executor</td><td>JSON</td><td>Raw execution results</td></tr>
+    <tr><td><code>generated_test_*.py</code></td><td>Test Executor</td><td>Python</td><td>Runnable Playwright/Selenium code</td></tr>
+    <tr><td><code>github_actions.yml</code></td><td>CI/CD Agent</td><td>YAML</td><td>GitHub Actions workflow</td></tr>
+    <tr><td><code>Jenkinsfile</code></td><td>CI/CD Agent</td><td>Groovy</td><td>Jenkins pipeline definition</td></tr>
+    <tr><td><code>jira_tickets_*.json</code></td><td>JIRA Agent</td><td>JSON</td><td>Created ticket tracking</td></tr>
+    <tr><td><code>pipeline_state_*.json</code></td><td>Orchestrator</td><td>JSON</td><td>Full state audit trail</td></tr>
+  </table>
+</div>
+
+<div class="card amber">
+  <h4>📂 10 Source Directories</h4>
+  <p>The document loader scans these directories under the configured <code>data_dir</code>:</p>
+  <table>
+    <tr><th>Directory</th><th>Purpose</th><th>Sample Data</th></tr>
+    <tr><td><code>01_selenium_framework</code></td><td>Reference Selenium test code</td><td>—</td></tr>
+    <tr><td><code>02_playwright_framework</code></td><td>Reference Playwright test code</td><td>—</td></tr>
+    <tr><td><code>03_test_cases</code></td><td>Generated test case output</td><td>—</td></tr>
+    <tr><td><code>04_jira_tickets</code></td><td>JIRA ticket exports</td><td>✅ sample_tickets.json</td></tr>
+    <tr><td><code>05_company_docs</code></td><td>QA standards & policies</td><td>✅ sample_qa_process.md</td></tr>
+    <tr><td><code>06_figma_designs</code></td><td>Exported design specs</td><td>—</td></tr>
+    <tr><td><code>07_meeting_notes</code></td><td>Meeting transcriptions</td><td>✅ sample_sprint42_planning.md</td></tr>
+    <tr><td><code>08_lucid_charts</code></td><td>Flow diagram exports</td><td>—</td></tr>
+    <tr><td><code>09_prd_srs_brd_frd</code></td><td>⭐ Primary requirements source</td><td>✅ ecommerce_prd.md, ecommerce_srs.md</td></tr>
+    <tr><td><code>10_jenkins_logs</code></td><td>CI/CD pipeline logs</td><td>—</td></tr>
+  </table>
+</div>
+</section>
+
+<!-- ===== CONFIGURATION ===== -->
+<section id="configuration">
+<h2>⚙️ Configuration</h2>
+
+<div class="card slate">
+  <h4>.env File Reference</h4>
+  <p>All configuration is driven by environment variables (via <code>.env</code> file):</p>
+  <table>
+    <tr><th>Variable</th><th>Default</th><th>Purpose</th></tr>
+    <tr><td><code>LLM_PROVIDER</code></td><td>ollama</td><td>LLM backend (ollama / openai / anthropic / deepseek)</td></tr>
+    <tr><td><code>LLM_MODEL</code></td><td>llama3.1</td><td>Model name</td></tr>
+    <tr><td><code>LLM_TEMPERATURE</code></td><td>0.1</td><td>Response creativity (0.0–1.0)</td></tr>
+    <tr><td><code>EMBED_MODEL</code></td><td>BAAI/bge-m3</td><td>Embedding model identifier</td></tr>
+    <tr><td><code>RERANK_MODEL</code></td><td>BAAI/bge-reranker-v2-m3</td><td>Re-ranking model identifier</td></tr>
+    <tr><td><code>BGE_USE_FP16</code></td><td>1</td><td>Enable FP16 acceleration for embeddings</td></tr>
+    <tr><td><code>QDRANT_URL</code></td><td>http://localhost:6333</td><td>Qdrant server URL</td></tr>
+    <tr><td><code>QDRANT_COLLECTION</code></td><td>qabuddy_docs</td><td>Qdrant collection name</td></tr>
+    <tr><td><code>DEEPSEEK_API_KEY</code></td><td>—</td><td>DeepSeek API key</td></tr>
+    <tr><td><code>OPENAI_API_KEY</code></td><td>—</td><td>OpenAI API key</td></tr>
+    <tr><td><code>JIRA_URL</code></td><td>—</td><td>JIRA instance URL</td></tr>
+    <tr><td><code>JIRA_API_TOKEN</code></td><td>—</td><td>JIRA API token</td></tr>
+    <tr><td><code>PLAYWRIGHT_HEADLESS</code></td><td>true</td><td>Run Playwright in headless mode</td></tr>
+    <tr><td><code>OUTPUT_DIR</code></td><td>./reports</td><td>Report output directory</td></tr>
+    <tr><td><code>DATA_DIR</code></td><td>./data</td><td>Project documents directory</td></tr>
+  </table>
+</div>
+</section>
+
+<!-- ===== API REFERENCE ===== -->
+<section id="api-reference">
+<h2>📚 API Reference</h2>
+
+<div class="card slate">
+  <h4>CLI Commands</h4>
+  <p>The CLI is built with <strong>Click</strong> and invoked via <code>python -m cli &lt;command&gt;</code>:</p>
+  <table>
+    <tr><th>Command</th><th>Options</th><th>Description</th></tr>
+    <tr><td><code>run</code></td><td><code>-p &lt;project&gt; -f &lt;framework&gt; -o &lt;output&gt; --push-jira</code></td><td>Execute full 7-phase pipeline</td></tr>
+    <tr><td><code>ingest</code></td><td><code>-p &lt;project&gt;</code></td><td>Index documents into Qdrant only</td></tr>
+    <tr><td><code>ask</code></td><td><code>-q &lt;query&gt;</code></td><td>RAG query against knowledge base</td></tr>
+    <tr><td><code>extract</code></td><td><code>-p &lt;project&gt;</code></td><td>Extract requirements from docs</td></tr>
+    <tr><td><code>generate</code></td><td><code>-f &lt;feature&gt; -p &lt;project&gt;</code></td><td>Generate test cases</td></tr>
+    <tr><td><code>ui</code></td><td>—</td><td>Launch Streamlit web UI</td></tr>
+  </table>
+  <pre><code># Full pipeline
+python -m cli run --project ./data --framework playwright
+
+# Interactive queries
+python -m cli ask -q "What are the security requirements?"
+
+# Launch UI
+python -m cli ui  # Opens http://localhost:8501</code></pre>
+</div>
+
+<div class="card slate">
+  <h4>Streamlit UI Endpoints</h4>
+  <p>The web UI (<code>ui.py</code>) is a single-page Streamlit app with 5 tabs:</p>
+  <table>
+    <tr><th>Tab</th><th>Function</th><th>Key Components</th></tr>
+    <tr><td>🚀 Pipeline</td><td>Orchestrate & monitor pipeline</td><td>7-phase progress tracker, source ingestion status, summary stats with Plotly donut chart</td></tr>
+    <tr><td>📋 Test Cases</td><td>Browse generated test cases</td><td>Search input, severity filter, paginated cards with expandable step details</td></tr>
+    <tr><td>📊 Results</td><td>View execution results</td><td>Horizontal bar chart (duration), pass/fail cards with failure reasons</td></tr>
+    <tr><td>📑 Reports</td><td>View & download artifacts</td><td>Inline HTML report viewer, download buttons, CI/CD YAML previews, RTM table</td></tr>
+    <tr><td>💬 Q&A Chat</td><td>Interactive RAG chat</td><td>Chat interface querying ingested documents with document citations</td></tr>
+  </table>
+</div>
+
+<div class="card terracotta">
+  <h4>Programmatic Usage</h4>
+  <p>All components can be used directly in Python scripts:</p>
+  <pre><code>from src.agents.orchestrator import Orchestrator
+
+# Run full pipeline
+orch = Orchestrator(
+    data_dir="./data",
+    framework="playwright",
+    output_dir="./reports",
+    push_jira=False,
+)
+state = orch.run()
+print(f"Generated {len(state['test_cases'])} test cases")
+print(f"Report: {state['report_path']}")
+
+# Individual agents
+from src.agents.document_analyzer import DocumentAnalyzerAgent
+agent = DocumentAnalyzerAgent()
+agent.ingest("./data")
+response = agent.analyze_document("What are the edge cases for checkout?")
+print(response)</code></pre>
+</div>
+</section>
+
+</main>
+
+<footer>
+  <p>QABuddyAI Documentation · Python · LangGraph · BGE-m3 · Qdrant · DeepSeek</p>
+  <p style="margin-top: 0.3rem;">Chapter 8 — LearningAIProject · AI-Powered QA Automation Platform</p>
+</footer>
+
+</body>
+</html>
